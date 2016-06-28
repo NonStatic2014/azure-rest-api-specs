@@ -242,7 +242,7 @@
           }
         }
       }
-    }    
+    }
   },
   "parameters": {
     "SubscriptionIdParameter": {
@@ -357,7 +357,7 @@
         },
         "keys": {
           "$ref": "#/definitions/WebServiceKeys",
-          "description":  "The set of access keys for the web service. If not specified at creation time (PUT), they will be generated automatically by the resource provider."
+          "description": "The set of access keys for the web service. If not specified at creation time (PUT), they will be generated automatically by the resource provider."
         },
         "readOnly": {
           "type": "boolean",
@@ -369,8 +369,8 @@
           "readOnly": true
         },
         "exposeSampleData": {
-            "type": "boolean",
-            "description": "Flag that controls whether to expose sample data or not in the web service's swagger definition."
+          "type": "boolean",
+          "description": "Flag that controls whether to expose sample data or not in the web service's swagger definition."
         },
         "realtimeConfiguration": {
           "$ref": "#/definitions/RealtimeConfiguration",
@@ -393,7 +393,7 @@
           "description": "The commitment plan associated with this web service. This is required to be specified at creation time (PUT) and is not updateable afterwards."
         },
         "input": {
-          "$ref": "#/definitions/ServiceInputOutputSpecification",
+          "$ref": "#/definitions/InputOutputPayload",
           "description": "Swagger schema for the service's input(s), as applicable."
         },
         "output": {
@@ -412,18 +412,14 @@
           }
         },
         "parameters": {
-          "type": "object",
-          "description": "The set of global parameters values defined for the web service, given as a global parameter name to default value map. If no default value is specified, the parameter is considered to be required.",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/GlobalParameters"
         },
         "packageType": {
           "type": "string",
           "description": "The type of package deployed with this web service. Only Graph based services are supported at this time.",
           "enum": [
             "Graph"
-          ]        
+          ]
         }
       }
     },
@@ -549,8 +545,95 @@
         }
       },
       "required": [
-        "id"        
+        "id"
       ]
+    },
+    "GlobalParameters": {
+      "type": "object",
+      "description": "Global paramters properties",
+      "required": [
+        "inStorage"
+      ],
+      "discriminator": "inStorage",
+      "properties": {
+        "inStorage": {
+          "type": "boolean",
+          "description": "The indicator if the payload is inline or in BYOS"
+        }
+      }
+    },
+    "GlobalParametersInStorage": {
+      "description": "Global paramters in storage",
+      "x-ms-descriminator-value": true,
+      "allOf": [
+        {
+          "$ref": "#/definitions/GlobalParameters"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/LocationInfo"
+        }
+      }
+    },
+    "GlobalParametersInline": {
+      "description": "The set of global parameters values defined for the web service, given as a global parameter name to default value map. If no default value is specified, the parameter is considered to be required.",
+      "x-ms-descriminator-value": false,
+      "allOf": [
+        {
+          "$ref": "#/definitions/GlobalParameters"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "InputOutputPayload": {
+      "type": "object",
+      "description": "Input/Output payload properties",
+      "required": [
+        "inStorage"
+      ],
+      "discriminator": "inStorage",
+      "properties": {
+        "inStorage": {
+          "type": "boolean",
+          "description": "The indicator if the payload is inline or in BYOS"
+        }
+      }
+    },
+    "InputOutputPayloadInline": {
+      "description": "Input/Output properties for inline",
+      "x-ms-descriminator-value": false,
+      "allOf": [
+        {
+          "$ref": "#/definitions/InputOutputPayload"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/ServiceInputOutputSpecification"
+        }
+      }
+    },
+    "InputOutputPayloadInStorage": {
+      "description": "Input/Output properties for inline",
+      "x-ms-descriminator-value": true,
+      "allOf": [
+        {
+          "$ref": "#/definitions/InputOutputPayload"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "$ref": "#/definitions/LocationInfo"
+        }
+      }
     },
     "ServiceInputOutputSpecification": {
       "type": "object",
@@ -729,7 +812,7 @@
         },
         "locationInfo": {
           "description": "Access information for the asset.",
-          "$ref": "#/definitions/AssetLocation"
+          "$ref": "#/definitions/LocationInfo"
         },
         "inputPorts": {
           "type": "object",
@@ -766,7 +849,7 @@
         "locationInfo"
       ]
     },
-    "AssetLocation": {
+    "LocationInfo": {
       "type": "object",
       "description": "Describes the access location for a web service asset.",
       "properties": {
